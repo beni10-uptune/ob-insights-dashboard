@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth-config"
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -16,7 +16,7 @@ export async function POST(
       )
     }
 
-    const articleId = params.id
+    const { id: articleId } = await params
 
     // In a real implementation, you would store bookmarks in a database
     // For now, we'll just return success
@@ -37,7 +37,7 @@ export async function POST(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -49,7 +49,7 @@ export async function DELETE(
       )
     }
 
-    const articleId = params.id
+    const { id: articleId } = await params
 
     // In a real implementation, you would remove bookmarks from database
     // For now, we'll just return success
