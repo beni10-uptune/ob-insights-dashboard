@@ -31,7 +31,7 @@ export async function GET() {
 
     // Test if we can connect to Supabase
     try {
-      const { data: testQuery, error: testError } = await supabase
+      const { error: testError } = await supabase
         .from("users")
         .select("count(*)")
         .limit(1)
