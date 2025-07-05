@@ -47,13 +47,32 @@ export default function SetupPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           {!result ? (
-            <Button 
-              onClick={createAdminUser} 
-              disabled={isLoading}
-              className="w-full"
-            >
-              {isLoading ? "Creating Admin User..." : "Create Admin User"}
-            </Button>
+            <div className="space-y-4">
+              <Button 
+                onClick={createAdminUser} 
+                disabled={isLoading}
+                className="w-full"
+              >
+                {isLoading ? "Creating Admin User..." : "Create Admin User"}
+              </Button>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="text-blue-800 font-medium mb-2">Ready to Sign In?</h4>
+                <p className="text-blue-700 text-sm mb-3">Your admin account is already set up!</p>
+                <div className="bg-white rounded border p-3 mb-3">
+                  <h5 className="font-medium text-gray-900 mb-2">Use these credentials:</h5>
+                  <div className="text-sm space-y-1">
+                    <p><span className="font-medium">Email:</span> b10smith5@gmail.com</p>
+                    <p><span className="font-medium">Password:</span> Admin123!</p>
+                    <p><span className="font-medium">Role:</span> Admin</p>
+                  </div>
+                </div>
+                <Link href="/auth/signin">
+                  <Button className="w-full">
+                    Sign In Now →
+                  </Button>
+                </Link>
+              </div>
+            </div>
           ) : (
             <div className="space-y-4">
               {result.status === "success" ? (
