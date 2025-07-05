@@ -5,8 +5,22 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
 
+interface SetupResult {
+  status: "success" | "error"
+  message: string
+  credentials?: {
+    email: string
+    password: string
+  }
+  user?: {
+    id: string
+    email: string
+    role: string
+  }
+}
+
 export default function SetupPage() {
-  const [result, setResult] = useState<any>(null)
+  const [result, setResult] = useState<SetupResult | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
   const createAdminUser = async () => {
@@ -15,7 +29,7 @@ export default function SetupPage() {
       const response = await fetch("/api/seed")
       const data = await response.json()
       setResult(data)
-    } catch (error) {
+    } catch {
       setResult({ status: "error", message: "Failed to connect to API" })
     } finally {
       setIsLoading(false)
@@ -47,14 +61,16 @@ export default function SetupPage() {
                   <h3 className="text-green-800 font-medium mb-2">✅ Success!</h3>
                   <p className="text-green-700 text-sm mb-3">{result.message}</p>
                   
-                  <div className="bg-white rounded border p-3 mb-3">
-                    <h4 className="font-medium text-gray-900 mb-2">Your Credentials:</h4>
-                    <div className="text-sm space-y-1">
-                      <p><span className="font-medium">Email:</span> {result.credentials.email}</p>
-                      <p><span className="font-medium">Password:</span> {result.credentials.password}</p>
-                      <p><span className="font-medium">Role:</span> Admin</p>
+                  {result.credentials && (
+                    <div className="bg-white rounded border p-3 mb-3">
+                      <h4 className="font-medium text-gray-900 mb-2">Your Credentials:</h4>
+                      <div className="text-sm space-y-1">
+                        <p><span className="font-medium">Email:</span> {result.credentials.email}</p>
+                        <p><span className="font-medium">Password:</span> {result.credentials.password}</p>
+                        <p><span className="font-medium">Role:</span> Admin</p>
+                      </div>
                     </div>
-                  </div>
+                  )}
                   
                   <Link href="/auth/signin">
                     <Button className="w-full">
