@@ -9,22 +9,68 @@ const supabase = createClient(
 
 export async function GET() {
   try {
+    // Test connection first
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    
+    if (!supabaseUrl || !supabaseKey) {
+      return NextResponse.json({
+        status: "error",
+        message: "Missing Supabase environment variables",
+        details: {
+          hasUrl: !!supabaseUrl,
+          hasKey: !!supabaseKey
+        }
+      }, { status: 500 })
+    }
+
     // Create admin user
     const adminEmail = "b10smith5@gmail.com"
     const adminPassword = "Admin123!"
     const adminName = "Ben Smith"
 
+    // Test if we can connect to Supabase
+    try {
+      const { data: testQuery, error: testError } = await supabase
+        .from("users")
+        .select("count(*)")
+        .limit(1)
+
+      if (testError) {
+        return NextResponse.json({
+          status: "error",
+          message: "Cannot connect to Supabase database",
+          error: testError.message,
+          details: "Check if the users table exists and environment variables are correct"
+        }, { status: 500 })
+      }
+    } catch (connectionError) {
+      return NextResponse.json({
+        status: "error",
+        message: "Database connection failed",
+        error: String(connectionError)
+      }, { status: 500 })
+    }
+
     // Check if admin already exists
-    const { data: existingUser } = await supabase
+    const { data: existingUser, error: selectError } = await supabase
       .from("users")
       .select("id, email, role")
       .eq("email", adminEmail)
-      .single()
+      .maybeSingle()
+
+    if (selectError) {
+      return NextResponse.json({
+        status: "error", 
+        message: "Error checking existing users",
+        error: selectError.message
+      }, { status: 500 })
+    }
 
     if (existingUser) {
       return NextResponse.json({
         status: "success",
-        message: "Admin user already exists",
+        message: "Admin user already exists - you can sign in now!",
         user: {
           email: existingUser.email,
           role: existingUser.role,
@@ -57,7 +103,8 @@ export async function GET() {
       return NextResponse.json({
         status: "error",
         message: "Failed to create admin user",
-        error: error.message
+        error: error.message,
+        details: error
       }, { status: 500 })
     }
 
